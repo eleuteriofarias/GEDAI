@@ -1,0 +1,164 @@
+Option Explicit
+'Eleutério Farias
+Dim Vmax, Vmin, Var, DeP, Media, Freq, EvtA, EvtB, Lambda, T, VmaxAmostra, VMinAmostra As Double
+Dim X, Y, Z, VAmostra, QTotal, QAmostra As Double
+Dim i, c, l, k, ContaCol As Long
+Dim Inclinacao, Intercep As Double
+Dim TotalObs, Chamada, Esperado, e As Double
+Public Sub Estatisticas()
+        
+    
+    Vmax = 0: Vmin = 0: Var = 0: DeP = 0: Media = 0
+    
+    'Range(Cells(2, 1), Cells(Selection.End(xlDown).Row, 1)).Select
+    Set X = Range(Cells(2, 1), Cells(Selection.End(xlDown).Row, 1))
+    Set Y = Range(Cells(2, 2), Cells(Selection.End(xlDown).Row, 2))
+    'Set Z = Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3))
+    
+    Vmax = WorksheetFunction.Max(X)
+    Vmin = WorksheetFunction.Min(X)
+    Var = WorksheetFunction.Var(X)
+    DeP = WorksheetFunction.StDev(X)
+    Media = WorksheetFunction.Average(X)
+    QTotal = WorksheetFunction.CountA(X)
+    'QAmostra = WorksheetFunction.CountA(Z)
+    'Freq = WorksheetFunction.CountIf(X, "69")
+    'Cells(2, 4) = Var: Cells(3, 4) = DeP: Cells(4, 4) = Freq
+    'Cells(4, 4) = WorksheetFunction.ImSqrt(Media)
+    'Cells(5, 4) = Sqr(Media)
+    
+    'Z = WorksheetFunction.Poisson(Cells(3, 4), Cells(4, 4), False)
+    'Cells(8, 4) = Z
+    'CHAMA FUNÇÃO
+    Prob
+    Set X = Nothing
+    Set Y = Nothing
+    ActiveWorkbook.Save
+    
+End Sub
+Public Sub Prob()
+    Dim QuanAmost As Long
+    Dim Probab, Fator, Mx, e As Double
+        
+    'MODELO MATEMATICO
+    'P(X)= (Lamda*T)^x * e^-Lambda*T/x! - Distribuição de Poisson
+    
+    'VERIFICA TODOS OS QUE FOREM < 100
+    l = 2: i = 2
+    Do
+        If (Cells(l, 1) <> Empty) Then
+            If (Cells(l, 1) <= 100) Then
+                Cells(l, 1).Copy
+                Cells(i, 3).Select
+                ActiveSheet.Paste
+                Application.CutCopyMode = False
+'                Cells(i, 3) = Format(Cells(i, 3) / 100, "00%")
+                i = i + 1
+            Else
+                'l = l + 1
+            End If
+        Else
+            l = l + 1
+        End If
+        l = l + 1
+        
+    Loop Until (Cells(l, 1) = Empty)
+    
+    Set Mx = Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3))
+'    Mx = WorksheetFunction.Sort(Mx)
+    Cells(2, 3).Select
+    Ordenar.Ordemamento
+    
+    'CAPTURO A AMOSTRA SELECIONADA (<=100)
+    Set VAmostra = Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3))
+    
+    Vmax = WorksheetFunction.Max(VAmostra)
+    Vmin = WorksheetFunction.Min(VAmostra)
+    Media = WorksheetFunction.Average(VAmostra)
+    QuanAmost = WorksheetFunction.CountA(VAmostra)
+    DeP = WorksheetFunction.StDev(VAmostra)
+    Var = WorksheetFunction.Var(VAmostra)
+    Cells(2, 14) = Vmax: Cells(3, 14) = Vmin
+    Cells(4, 14) = Vmax - Vmin
+    Cells(5, 14) = QuanAmost
+    Cells(6, 14) = Probab
+    Cells(7, 14) = Media
+    Cells(8, 14) = DeP
+    Cells(9, 14) = Var
+    
+    'CAPTURO A MATRIX DE FREQUENCIA ABSOLUTA
+    Set Freq = Range(Cells(2, 4), Cells(Selection.End(xlDown).Row, 4))
+    VmaxAmostra = WorksheetFunction.Max(Freq)
+    VMinAmostra = WorksheetFunction.Min(Freq)
+    k = 2
+    
+'    Do While (Cells(k, 4) <> emtpy)
+'
+'    Loop
+'    Cells(10, 4) = Probab
+'    Cells(10, 4).Select: Selection.NumberFormat = "0.00000000%"
+    
+    Set VAmostra = Nothing
+    
+End Sub
+Public Sub RegreLinear()
+        
+    'ARMAZENA FEATURES
+    'INTERCEPTAÇÃO DA RETA DE REGRESSÃO LINEAR (VALORES DE Y DEPENDENTES)
+    Set Intercep = Range(entradadosCockpit.Cells(12, 12), entradadosCockpit.Cells(Selection.End(xlDown).Row, 12))
+    'INCLINAÇÃO DA RETA DE REGRESSÃO LINEAR (VALORES DE X INDEPENDENTES - PREDITORES)
+    Set Inclinacao = Range(entradadosCockpit.Cells(12, 12), entradadosCockpit.Cells(Selection.End(xlDown).Row, 12))
+       
+End Sub
+Public Sub ModelagemPoisson()
+    Dim Lambda As Double, n As Double
+'    Range(Cells(3, 2), Cells(Selection.End(xlDown).Column, 3)).Select
+    'c = (Cells(3, 2).End(xlToLeft).Column)
+    'c = (Cells(3, Columns.Count).End(xlToLeft).Column)
+    'c = Range(Cells(3, 2), Cells(3, Columns.Count).End(xlToLeft).Columns).Select
+    ContaCol = Cells(3, Columns.Count).End(xlToLeft).Column
+    n = ContaCol
+    Set c = Range(Cells(3, 2), Cells(3, Columns.Count).End(xlToLeft).Columns)
+    Lambda = WorksheetFunction.Average(c)
+    TotalObs = WorksheetFunction.Sum(c)
+    
+    e = Exp(1)
+    Esperado = PoissonModel(Lambda, n)
+    
+    Esperado = TotalObs * Esperado
+    Cells(4, 2) = Esperado
+    
+End Sub
+Public Function PoissonModel(Lambda As Double, n As Double, i As Long) As Double
+    Dim P As Double
+    
+    'MODELO MATEMÁTICO | POISSON
+    'P(X)=Lambda^n * e^-Lambda/n!
+    'P(N) = (Lambda ^ N) * e ^ -Lambda / N!
+    'VARIÁVEIS
+    'i = 2
+    
+    e = Exp(1) ' * -1
+    Lambda = Cells(i, 5): n = Cells(5, 11) 'WorksheetFunction.Fact(Lambda)
+    P = (Lambda ^ n) * (1 / e ^ Lambda) 'e ^ (-Lambda) / n
+    
+    PoissonModel = P
+     
+End Function
+Public Sub soma()
+Dim soma As Double
+Dim Resposta As Double
+
+'    soma = Somar(2.878799987766, 2)
+'    MsgBox soma
+    Resposta = MRound(123.456, 0.5)
+    MsgBox Resposta
+
+End Sub
+Public Function MRound(X As Double, Y As Double) As Double
+    MRound = (X + Y)
+End Function
+Public Function Somar(X As Double, Y As Double) As Double
+    Somar = X + Y
+End Function
+
