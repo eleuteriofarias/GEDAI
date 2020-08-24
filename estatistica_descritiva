@@ -1,0 +1,162 @@
+Option Explicit
+'Eleuterio Farias
+Dim i, l, k, j, Contador, soma, ContNum, Ncol, Ncolr, ContaCol, ContarCol, ContaLinha, Contalinha1, Vmin, _
+Vmax, Dp As Long
+Dim Y, Z As Variant
+Dim Inicio, Fim, CalcProb As Double
+Dim FreqAb, FreqRel, FreqAc, FreqRelAc As Variant
+Public Sub Frequencia()
+    Dim somaFre As Long, i As Long
+    'Dim Lambda As Double, n As Double
+    i = 2
+    j = 2
+    ContaLinha = 0: Cells(2, 3).Activate
+    'ContaLinha = Range(Cells(Rows.Count, 3), Selection.End(xlDown).Row, 3)
+    'ContaLinha = Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3)).Rows.Count
+    Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3)).Select
+    Contalinha1 = Selection.Rows.Count
+   ' l = Selection.Rows.Count
+    'Cells(2, 5) = ContaLinha
+    somaFre = 1
+    Contalinha1 = Contalinha1 + 1
+    'FREQUENCIA ABSOLUTA
+    For i = 2 To Contalinha1
+        If (Cells(i + 1, 3) = Cells(i, 3)) Then
+            
+            somaFre = WorksheetFunction.Count(somaFre) + (somaFre)
+            
+        Else
+            Cells(j, 4) = Cells(i, 3)
+            Cells(j, 5) = somaFre
+            j = j + 1: somaFre = 1
+        End If
+        
+    Next
+    
+    'FREQUENCIA RELATIVA / ACUMULADA / RELATIVA ACUMULADA
+    Contalinha1 = 0: Cells(2, 5).Activate
+    Contalinha1 = Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 3)).Rows.Count
+    Contalinha1 = Contalinha1 + 1
+    i = 2: j = 2
+    For i = 2 To Contalinha1
+        Cells(i, 6) = Cells(i, 5) / Cells(5, 14)                        'FREQUENCIA RELATIVA
+        If (Cells(i - 1, 5) = "Freq_Ab") Then
+            Cells(j, 7) = Cells(i, 5)                                   'FREQUENCIA ACUMULADA
+            Cells(j, 8) = Cells(j, 7) / Cells(5, 14)                    'FREQUENCIA RELATIVA ACUMULADA
+            'PROBABILIDADES
+            'Cells(j, 9) = PoissonModel(Lambda, n, i)                   'MODELO MATEMÁTICO
+            CalcProb = (Cells(i, 5) / Cells(5, 14))                     'P(E)=N(E)/N(S)
+            Cells(i, 9) = CalcProb                                      'E=Evento | S=ESPAÇO AMOSTRAL
+            Cells(i, 9).Select
+            Selection.NumberFormat = "0.000000%"
+            
+            j = j + 1
+        Else
+            Cells(j, 7) = Cells(i, 5) + Cells(j - 1, 7)                 'FREQUENCIA ACUMULADA
+            Cells(j, 8) = Cells(j, 7) / Cells(4, 14)                    'FREQUENCIA RELATIVA ACUMULADA
+            
+            'Cells(j, 9) = PoissonModel(Lambda, n, i)
+            'Cells(i, 9).Select
+            'Selection.NumberFormat = "0.000000%"
+            CalcProb = (Cells(i, 5) / Cells(4, 14))
+            Cells(i, 9) = CalcProb
+            Cells(i, 9).Select
+            Selection.NumberFormat = "0.000000%"
+            
+            j = j + 1
+        End If
+        'Cells(i, 6).Select
+        'Selection.NumberFormat = "0.000000%"
+    Next
+    
+    'SOMA O TOTAL DAS FREQUENCIAS
+    'FREQUENCIAS ABSOLUTAS
+    Set FreqAb = Range(Cells(2, 5), Cells(Selection.End(xlDown).Row, 5))
+    Cells(i, 5) = WorksheetFunction.Sum(FreqAb)
+    'FREQUENCIAS RELATIVAS
+    Set FreqRel = Range(Cells(2, 6), Cells(Selection.End(xlDown).Row, 6))
+    Cells(i, 6) = WorksheetFunction.Sum(FreqRel)
+    'FREQUENCIAS ACUMULADAS
+    'Set FreqAc = Range(Cells(2, 7), Cells(Selection.End(xlDown).Row, 7))
+    'Cells(j, 7) = WorksheetFunction.Sum(FreqAc)
+    'FREQUENCIAS RELATIVAS ACUMULADAS
+    'Set FreqRelAc = Range(Cells(2, 8), Cells(Selection.End(xlDown).Row, 8))
+    'Cells(j, 8) = WorksheetFunction.Sum(FreqRelAc)
+    
+    'LIBERA MATRIX
+    Set FreqAb = Nothing
+    Set FreqRel = Nothing
+    Set FreqAc = Nothing
+    Set FreqRelAc = Nothing
+    
+    
+    Cells(2, 4).Activate
+    ActiveWorkbook.Save
+End Sub
+Public Sub GeraAlea()
+    'Dim MX() As Variant
+    
+    Cells(1, 2) = Now
+'    Cells(1, 2) = Format(Cells(1, 2), Mid(Cells(1, 2), 1, 15))
+    
+    'Cells(1, 2) = Da
+    
+    'LIMPA OS DADOS DA PLANILHA
+    Range(Cells(2, 1), Cells(Selection.End(xlDown).Row, 2)).Select
+    Selection.ClearContents
+    Range(Cells(2, 3), Cells(Selection.End(xlDown).Row, 9)).Select
+    Selection.ClearContents
+    
+'    Range(Cells(2, 1), Cells(Selection.End(xlDown).Row, 9)).Select
+'    Selection.ClearContents
+        
+    Range(Cells(2, 1), Cells(Selection.Row, 2)).Select
+    Ncol = Selection.Columns.Count
+    Contador = 2
+    Cells(2, 1).Select
+    For j = 1 To Ncol
+        Select Case Cells(3, 19)
+            'SIMULAÇÃO DE 5.000 EVENTOS
+            Case Is = 1
+            Cells(2, j).Select
+            Cells(1, 14) = "5 Mil"
+            For i = 1 To 5000
+                Cells(Contador, j) = Application.WorksheetFunction.RandBetween(69, 291)
+                Cells(Contador, j).Select
+                Cells(Contador, j).HorizontalAlignment = xlCenter
+                Contador = Contador + 1
+            Next
+            Contador = 2
+            'SIMULAÇÃO DE 10.000 EVENTOS
+            Case Is = 2
+            Cells(2, j).Select
+            Cells(1, 14) = "10 Mil"
+            For i = 1 To 10000
+                Cells(Contador, j) = Application.WorksheetFunction.RandBetween(69, 391)
+                Cells(Contador, j).Select
+                Cells(Contador, j).HorizontalAlignment = xlCenter
+                Contador = Contador + 1
+            Next
+            Contador = 2
+            'SIMULAÇÃO DE 20.000 EVENTOS
+            Case Is = 3
+            Cells(2, j).Select
+            Cells(1, 14) = "20 Mil"
+            For i = 1 To 20000
+                Cells(Contador, j) = Application.WorksheetFunction.RandBetween(69, 391)
+                Cells(Contador, j).Select
+                Cells(Contador, j).HorizontalAlignment = xlCenter
+                Contador = Contador + 1
+            Next
+            Contador = 2
+            
+        End Select
+    Next
+    
+    Cells(2, 3).Select
+    'CalculoEstatistico.Estatisticas
+    'Application.SendKeys "^{HOME}", True
+    'Application.SendKeys "{DOWN 2}", True
+    Frequencia
+    '
+End Sub
