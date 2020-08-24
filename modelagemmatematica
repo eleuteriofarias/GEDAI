@@ -1,0 +1,80 @@
+Option Explicit
+'Eleutério Farias
+Dim i, l, j, k, Linha, MaxVal, MinVal, MedVal, TotalVal As Double
+Dim matrix()
+Dim dataHora As Date
+Public Sub ModelaDados()
+
+    l = 6
+            'Range(entradadosCockpit.Cells(l, 9), Cells(Selection.End(xlDown).Row, 9)).Select
+            matrix = Range(entradadosCockpit.Cells(l, 9), Cells(Selection.End(xlDown).Row, 9))
+
+            'MAX VALOR, MIN VALOR, MÉD VALOR, TOTAL
+            MaxVal = WorksheetFunction.Max(matrix)
+            'MinVal = WorksheetFunction.Min(Matrix)
+            MedVal = WorksheetFunction.Average(matrix)
+            TotalVal = WorksheetFunction.Sum(matrix)
+            entradadosCockpit.Cells(6, 15) = MaxVal: entradadosCockpit.Cells(7, 15) = MedVal
+            entradadosCockpit.Cells(8, 15) = TotalVal
+
+            'Range(entradadosCockpit.Cells(l, 12), Cells(Selection.End(xlDown).Row, 12)).Select
+            matrix = Range(entradadosCockpit.Cells(l, 12), Cells(Selection.End(xlDown).Row, 12))
+
+            'MAX VALOR, MIN VALOR, MÉD VALOR, TOTAL
+            MaxVal = WorksheetFunction.Max(matrix)
+            MinVal = WorksheetFunction.Min(matrix)
+            MedVal = WorksheetFunction.Average(matrix)
+            TotalVal = WorksheetFunction.Sum(matrix)
+            entradadosCockpit.Cells(6, 16) = MaxVal: entradadosCockpit.Cells(7, 16) = MedVal
+            entradadosCockpit.Cells(8, 16) = TotalVal
+
+'            Range(entradadosCockpit.Cells(4, 7), Cells(Selection.End(xlDown).Row, 9)).Select
+'            Selection.Style = "Comma"
+'            Selection.NumberFormat = "_-* #,##0.0_-;-* #,##0.0_-;_-* ""-""??_-;_-@_-"
+'            Selection.NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* ""-""??_-;_-@_-"
+'            entradadosCockpit.Cells(4, 2).Select
+            l = 6
+            'LOOP1
+            Do While (entradadosCockpit.Cells(l, 9) <> Empty)
+                
+                If (entradadosCockpit.Cells(l, 9) = entradadosCockpit.Cells(6, 15)) Then
+                    
+                    entradadosCockpit.Cells(11, 15) = entradadosCockpit.Cells(l, 9)
+                    entradadosCockpit.Cells(11, 14) = entradadosCockpit.Cells(l, 7)
+                    GoTo line1
+                Else
+                    l = l + 1
+                End If
+                
+            Loop
+line1:
+            l = 6
+            'LOOP2
+            Do While (entradadosCockpit.Cells(l, 12) <> Empty)
+                
+                If (entradadosCockpit.Cells(l, 12) = entradadosCockpit.Cells(6, 16)) Then
+                    'pega valor e filial
+                    entradadosCockpit.Cells(12, 14) = entradadosCockpit.Cells(l, 10)
+                    entradadosCockpit.Cells(12, 15) = entradadosCockpit.Cells(6, 16)
+                    GoTo line2
+                Else
+                    l = l + 1
+                End If
+            
+            Loop
+line2:
+
+'            Range(entradadosCockpit.Cells(6, 13), Cells(Selection.End(xlDown).Row, 14)).Select
+'            Selection.Style = "Comma"
+'            Selection.NumberFormat = "_-* #,##0.0_-;-* #,##0.0_-;_-* ""-""??_-;_-@_-"
+'            Selection.NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* ""-""??_-;_-@_-"
+'
+'            Range(entradadosCockpit.Cells(11, 13), Cells(Selection.End(xlDown).Row, 13)).Select
+'            Selection.Style = "Comma"
+'            Selection.NumberFormat = "_-* #,##0.0_-;-* #,##0.0_-;_-* ""-""??_-;_-@_-"
+'            Selection.NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* ""-""??_-;_-@_-"
+'
+            entradadosCockpit.Cells(6, 2).Select
+
+    'ActiveWorkbook.Save
+End Sub
