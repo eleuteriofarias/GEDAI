@@ -1,0 +1,23 @@
+Option Explicit
+'Eleutério Farias
+'Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+Dim M As String
+Public Sub Principal()
+
+    'INTERFACE COM O USUÁRIO
+    M = MsgBox("Deseja atualizar a base toda?", vbYesNo + vbInformation, "Mensagem")
+    If M = vbYes Then
+        Application.StatusBar = "AGUARDE, GERANDO AS ESTATÍSTICAS..."
+        'Frequencia_Geral.ContaTudo
+    Else
+        MsgBox "Declinado", vbInformation, "Mensagem"
+    End If
+    
+        
+    'FIND
+    'ASSINATURA DO AUTOR:
+    Application.StatusBar = "Desenvolvedor: Eleutério Farias JEDI-MATH | GEDAI - LOG Versão 1.1"
+    
+
+
+End Sub
