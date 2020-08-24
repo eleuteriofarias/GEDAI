@@ -1,0 +1,26 @@
+Dim ChartNum As Integer
+Public Sub LimparDadosCockpit()
+    Range(entradadosCockpit.Cells(9, 2), Cells(Selection.End(xlDown).Row, 9)).Select
+    Selection.ClearContents
+    entradadosCockpit.Cells(9, 2).Select
+End Sub
+Public Sub LimparDadosAux1()
+    Range(entraAux1.Cells(2, 2), Cells(Selection.End(xlDown).Row, 22)).Select
+    Selection.ClearContents
+    entraAux1.Cells(2, 2).Select
+End Sub
+Public Sub Salvar()
+    ActiveWorkbook.Save
+End Sub
+Public Sub OcultaGraficos()
+'    ChartObjects("GraficoOTIF").Visible = False
+'    'Set CurrentChart = Sheets("Painel").ChartObjects(ChartNum).Chart
+'    ChartObjects("GraficoOTIF").Visible = False
+'    ChartObjects("GraficoR/Ton").Visible = False
+'    ChartObjects("GraficoReal/TonM").Visible = False
+End Sub
+Public Sub RemoveDuplicadas()
+    Range(Selection, Selection.End(xlDown)).Select
+    ActiveSheet.Range("$A$1:$A$37").RemoveDuplicates Columns:=1, Header:=xlYes
+    Range("B2").Select
+End Sub
